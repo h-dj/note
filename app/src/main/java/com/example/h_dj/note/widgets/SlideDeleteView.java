@@ -23,7 +23,6 @@ public class SlideDeleteView extends ViewGroup {
     private ViewDragHelper mHelper;
 
     private onItemSwipeListener mListener;
-    private boolean isShow;
 
     public SlideDeleteView(Context context) {
         super(context);

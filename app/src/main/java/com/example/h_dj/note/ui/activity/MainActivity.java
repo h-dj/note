@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_memnu, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -132,6 +132,9 @@ public class MainActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 mActivityMain.openDrawer(GravityCompat.START);
+                break;
+            case R.id.search:
+                goTo(SearchResultActivity.class);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
