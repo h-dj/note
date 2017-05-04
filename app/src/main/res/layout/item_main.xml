@@ -1,58 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:gravity="center|left"
-                android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"/>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_toRightOf="@+id/icon"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/item_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/title"
-            android:textSize="20sp"/>
-
-        <TextView
-            android:id="@+id/modifyTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="修改时间：05/03 22:56"/>
-    </LinearLayout>
+<com.example.h_dj.note.widgets.SlideDeleteView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="vertical">
 
 
-    <TextView
-        android:id="@+id/alarmClock"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="5dp"
-        android:drawableLeft="@drawable/clock_alarm"
-        android:drawablePadding="5dp"
-        android:gravity="center"
-        android:text="@string/alarmClock"/>
+    <include layout="@layout/item_content"/>
 
-    <ImageView
-        android:id="@+id/mark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:src="@drawable/mark"/>
-</RelativeLayout>
+    <include layout="@layout/item_del"/>
+
+</com.example.h_dj.note.widgets.SlideDeleteView>
