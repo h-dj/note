@@ -3,7 +3,6 @@ package com.example.h_dj.note.widgets;
 import android.content.Context;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +41,7 @@ public class SlideDeleteView extends ViewGroup {
      */
     @Override
     protected void onFinishInflate() {
-        Log.e(TAG, "onFinishInflate: ");
+//        Log.e(TAG, "onFinishInflate: ");
         super.onFinishInflate();
         mContent = getChildAt(0);
         mDelete = getChildAt(1);
@@ -58,7 +57,7 @@ public class SlideDeleteView extends ViewGroup {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.e(TAG, "onMeasure: ");
+//        Log.e(TAG, "onMeasure: ");
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mContent.measure(widthMeasureSpec, heightMeasureSpec);
         LayoutParams params = mDelete.getLayoutParams();
@@ -70,7 +69,7 @@ public class SlideDeleteView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        Log.e(TAG, "onLayout: ");
+//        Log.e(TAG, "onLayout: ");
         mContentWidth = mContent.getMeasuredWidth();
         mContentHight = mContent.getMeasuredHeight();
         mContent.layout(0, 0, mContentWidth, mContentHight);// 摆放内容部分的位置
@@ -90,7 +89,7 @@ public class SlideDeleteView extends ViewGroup {
          */
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
-            Log.e(TAG, "tryCaptureView: " + (mContent == child));
+//            Log.e(TAG, "tryCaptureView: " + (mContent == child));
 
             return mContent == child || mDelete == child;
         }
@@ -105,7 +104,7 @@ public class SlideDeleteView extends ViewGroup {
          */
         @Override
         public int clampViewPositionHorizontal(View child, int left, int dx) {
-            Log.e(TAG, "clampViewPositionHorizontal: " + (mContent == child) + left + ": " + (mDelete == child));
+//            Log.e(TAG, "clampViewPositionHorizontal: " + (mContent == child) + left + ": " + (mDelete == child));
             if (child == mContent) { // 解决内容部分左右拖动的越界问题
                 if (left > 0) {
                     return 0;
@@ -126,7 +125,7 @@ public class SlideDeleteView extends ViewGroup {
 
         @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
-            Log.e(TAG, "clampViewPositionVertical: ");
+//            Log.e(TAG, "clampViewPositionVertical: ");
             return super.clampViewPositionVertical(child, top, dy);
         }
 
@@ -141,7 +140,7 @@ public class SlideDeleteView extends ViewGroup {
          */
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-            Log.e(TAG, "onViewPositionChanged: " + left);
+//            Log.e(TAG, "onViewPositionChanged: " + left);
             invalidate();
             if (changedView == mContent) {
                 int tempDelleft = mContentWidth + left;
@@ -157,7 +156,7 @@ public class SlideDeleteView extends ViewGroup {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            Log.e(TAG, "onViewReleased: ");
+//            Log.e(TAG, "onViewReleased: ");
             int contentLeft = mContent.getLeft();
             /**
              * 释放时位置的归正
@@ -183,7 +182,7 @@ public class SlideDeleteView extends ViewGroup {
      * @param isShow
      */
     public void showDelButton(boolean isShow) {
-        Log.e(TAG, "showDelButton: " );
+//        Log.e(TAG, "showDelButton: " );
         if (isShow) {
             mContent.layout(-mDelWidth, 0, mContentWidth - mDelWidth, mContentHight);
             mDelete.layout(mContentWidth - mDelWidth, 0, mContentWidth, mContentHight);

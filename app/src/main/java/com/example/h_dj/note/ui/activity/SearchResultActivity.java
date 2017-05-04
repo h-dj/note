@@ -144,7 +144,7 @@ public class SearchResultActivity<E> extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.back:
-                goTo(MainActivity.class, null, true);
+              this.finish();
                 break;
             case R.id.delete:
                 mEtQueryText.setText("");
