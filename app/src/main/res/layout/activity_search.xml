@@ -27,10 +27,10 @@
             android:drawableLeft="@drawable/query_text"
             android:drawablePadding="8dp"
             android:hint="查询"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
             android:singleLine="true"
             android:textColor="@android:color/darker_gray"/>
 
@@ -41,10 +41,12 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:src="@drawable/delete"/>
+            android:src="@drawable/delete"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
