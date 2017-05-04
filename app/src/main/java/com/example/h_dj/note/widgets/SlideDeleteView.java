@@ -37,7 +37,9 @@ public class SlideDeleteView extends ViewGroup {
     }
 
     /**
-     * 当适配完布局后回掉
+     * after all child views have been added.
+     * 当适配完xml布局后回掉
+     * 在这个方法中可以得到布局中过的子视图
      */
     @Override
     protected void onFinishInflate() {
@@ -51,6 +53,7 @@ public class SlideDeleteView extends ViewGroup {
 
     /**
      * 测量
+     * 重写后必须执行setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)，以至于保存该view的宽高
      *
      * @param widthMeasureSpec
      * @param heightMeasureSpec
@@ -59,16 +62,27 @@ public class SlideDeleteView extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        Log.e(TAG, "onMeasure: ");
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        //测量内容部分的大小
         mContent.measure(widthMeasureSpec, heightMeasureSpec);
+        //测量删除按钮的大小
         LayoutParams params = mDelete.getLayoutParams();
         int delWidth = MeasureSpec.makeMeasureSpec(params.width, MeasureSpec.EXACTLY);
         int delHight = MeasureSpec.makeMeasureSpec(params.height, MeasureSpec.EXACTLY);
         mDelete.measure(delWidth, delHight);
+        //保存已测量的宽高
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
 
+
+    /**
+     * @param changed 改变的子孩子
+     * @param left    从父用器左边到子控件左边的距离
+     * @param top     从父用器顶部到子控件顶部的距离
+     * @param right   从父用器左边到子控件右边的距离
+     * @param bottom  从父用器顶部到子控件底部的距离
+     */
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 //        Log.e(TAG, "onLayout: ");
         mContentWidth = mContent.getMeasuredWidth();
         mContentHight = mContent.getMeasuredHeight();
