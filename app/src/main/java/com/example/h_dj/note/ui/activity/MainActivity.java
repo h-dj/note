@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
 
@@ -86,7 +87,7 @@ public class MainActivity extends BaseActivity {
 
                 //关闭菜单
                 mActivityMain.closeDrawer(GravityCompat.START);
-                return false;
+                return true;
             }
         });
         //  //通过NavigationView 获取头部布局来获取里面的控件
@@ -123,7 +124,7 @@ public class MainActivity extends BaseActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_memnu, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -167,5 +168,10 @@ public class MainActivity extends BaseActivity {
             }
             currentFragment = fragment;
         }
+    }
+
+    @OnClick(R.id.main_fab)
+    public void onViewClicked() {
+        goTo(ModifyDataActivity.class);
     }
 }
