@@ -3,11 +3,14 @@ package com.example.h_dj.note.ui.activity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +32,7 @@ import butterknife.OnClick;
  * Created by H_DJ on 2017/5/5.
  */
 
-public class ModifyDataActivity extends BaseActivity {
+public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener{
 
 
     @BindView(R.id.main_toolbar)
@@ -52,6 +55,8 @@ public class ModifyDataActivity extends BaseActivity {
     TextView mTvAlarmClockTime;
     @BindView(R.id.sp_type)
     Spinner mSpType;
+    @BindView(R.id.sll)
+    ScrollView mSll;
 
 
     /**
@@ -75,13 +80,19 @@ public class ModifyDataActivity extends BaseActivity {
     @Override
     public void init() {
         super.init();
+        //设置EditText获取焦点；软键盘显示或隐藏问题
+        mEtModifyContent.setOnFocusChangeListener(this);
+        mEtTitle.setOnFocusChangeListener(this);
+
         initToolbar();
         initNoteTypesData();
         initSpanner();
         initModifyTime();
         initPickerFragment();
         initDialog();
+
     }
+
 
     /**
      * 初始化
@@ -121,9 +132,9 @@ public class ModifyDataActivity extends BaseActivity {
                 .setNoClickListener("取消", new CustomDialog.OnNoClickListener() {
                     @Override
                     public void click(View v) {
-                        //注意：不要再dismiss()后做操作
-                        mTvAlarmClockTime.setVisibility(View.GONE);
                         mCustomDialog.dismiss();
+                        mTvAlarmClockTime.setVisibility(View.GONE);
+
                     }
                 });
     }
@@ -210,7 +221,6 @@ public class ModifyDataActivity extends BaseActivity {
 
     /**
      * 初始化Toolbar
-     * // TODO: 2017/5/5  做到这里
      */
     private void initToolbar() {
         setSupportActionBar(mMainToolbar);
@@ -232,13 +242,12 @@ public class ModifyDataActivity extends BaseActivity {
             case R.id.alarmClock:
                 //显示选择时间对话框
                 mCustomDialog.show();
-                Toast.makeText(ModifyDataActivity.this, "提醒", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ModifyDataActivity.this, "提醒", Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
                 this.finish();
                 break;
             case R.id.save:
-
                 String string = mEtModifyContent.getText().toString();
                 LogUtil.e(string + "");
                 break;
@@ -260,6 +269,7 @@ public class ModifyDataActivity extends BaseActivity {
                 break;
             case R.id.tv_doodle:
                 break;
+
         }
     }
 
@@ -268,10 +278,24 @@ public class ModifyDataActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mCustomDialog != null){
+        if (mCustomDialog != null) {
             mCustomDialog.dismiss();
-            mCustomDialog=null;
+            mCustomDialog = null;
         }
 
     }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (hasFocus) {
+            //显示软键盘
+            manager.showSoftInput(v, 0);
+        } else {
+            //隐藏软键盘
+            manager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+
+
 }

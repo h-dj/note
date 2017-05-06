@@ -45,31 +45,35 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingLeft="10dp"
-                android:textSize="10sp"
-                android:text="05/05 22:55"/>
+                android:text="05/05 22:55"
+                android:textSize="10sp"/>
 
             <TextView
-                android:textSize="10sp"
                 android:id="@+id/tv_alarmClock_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/clock_alarm"
                 android:drawablePadding="5dp"
-                android:visibility="gone"
-                android:text="05/05 22:55"/>
+                android:text="05/05 22:55"
+                android:textSize="10sp"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <ScrollView
+            android:id="@+id/sll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/ll_info"
+            android:fillViewport="true"
             android:layout_marginBottom="40dp"
             >
 
             <EditText
+                android:gravity="top"
                 android:id="@+id/et_modify_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@null"
                 />
 
         </ScrollView>
