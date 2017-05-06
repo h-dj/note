@@ -65,11 +65,13 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/ll_info"
             android:fillViewport="true"
+            android:paddingLeft="5dp"
             android:layout_marginBottom="40dp"
             >
 
             <EditText
                 android:gravity="top"
+                android:autoLink="all"
                 android:id="@+id/et_modify_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

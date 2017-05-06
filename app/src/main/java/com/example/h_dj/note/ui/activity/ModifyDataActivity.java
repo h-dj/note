@@ -1,9 +1,14 @@
 package com.example.h_dj.note.ui.activity;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.h_dj.note.R;
+import com.example.h_dj.note.utils.EditTextUtils;
 import com.example.h_dj.note.utils.LogUtil;
 import com.example.h_dj.note.widgets.CustomDialog;
 import com.example.h_dj.note.widgets.PickerFragment;
@@ -32,9 +38,10 @@ import butterknife.OnClick;
  * Created by H_DJ on 2017/5/5.
  */
 
-public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener{
+public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener {
 
 
+    private static final int TAKE_PICTURE = 1; //选择图片的requestCode
     @BindView(R.id.main_toolbar)
     Toolbar mMainToolbar;
     @BindView(R.id.et_modify_content)
@@ -69,6 +76,9 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     private CustomDialog mCustomDialog;//自定义对话框
     private PickerFragment mPickerFragment;//日期时间选择器
 
+    private EditTextUtils mEditTextUtils;//使EditText显示图片的utils
+
+    private InputMethodManager manager; //软键盘服务
     private String date;//日期
     private String time;//时间
 
@@ -84,12 +94,19 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         mEtModifyContent.setOnFocusChangeListener(this);
         mEtTitle.setOnFocusChangeListener(this);
 
+        mEditTextUtils = EditTextUtils.getInstance();
+        //获取软键盘服务
+        manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        //默认关闭软件盘
+        mEtTitle.clearFocus();
+        manager.hideSoftInputFromWindow(mEtTitle.getWindowToken(), 0);
         initToolbar();
         initNoteTypesData();
         initSpanner();
         initModifyTime();
         initPickerFragment();
         initDialog();
+
 
     }
 
@@ -185,7 +202,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
      */
     private void initModifyTime() {
         //获取当前时间
-        String format = new SimpleDateFormat("yyyy/MM/dd hh:mm").format(new Date());
+        String format = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
         mTvModifyTime.setText(format);
     }
 
@@ -264,6 +281,11 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
             case R.id.tv_video:
                 break;
             case R.id.tv_photo:
+                //选择图片
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, TAKE_PICTURE);
                 break;
             case R.id.tv_voice:
                 break;
@@ -273,6 +295,35 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case TAKE_PICTURE:
+                    Uri uri = data.getData();//获取全部图片的uri
+                    String[] pj = new String[]{MediaStore.Images.Media.DATA};
+                    Cursor query = getContentResolver().query(uri, pj, null, null, null);
+                    query.moveToFirst();
+                    int columnIndex = query.getColumnIndex(pj[0]);
+                    String picPath = query.getString(columnIndex);
+                    LogUtil.e(picPath);
+                    if (!TextUtils.isEmpty(picPath)) {
+                        CharSequence drawableStr = mEditTextUtils.with(this)
+                                .to(mEtModifyContent)
+                                .getDrawableStr(picPath);
+                        mEtModifyContent.append("\n\n");
+                        mEtModifyContent.append(drawableStr);
+                        mEtModifyContent.append("\n\n");
+                    }
+
+                    break;
+                default:
+                    super.onActivityResult(requestCode, resultCode, data);
+                    break;
+            }
+        }
+
+    }
 
     @Override
     protected void onDestroy() {
@@ -287,7 +338,6 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        InputMethodManager manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (hasFocus) {
             //显示软键盘
             manager.showSoftInput(v, 0);
