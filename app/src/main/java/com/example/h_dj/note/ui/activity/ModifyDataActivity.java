@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -13,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.h_dj.note.R;
 import com.example.h_dj.note.utils.LogUtil;
+import com.example.h_dj.note.widgets.CustomDialog;
+import com.example.h_dj.note.widgets.PickerFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,7 +59,13 @@ public class ModifyDataActivity extends BaseActivity {
      */
     private List<String> noteTypes;
 
-    private boolean isAlarmClock = true;
+    private boolean isAlarmClock = false; //是否设置提醒时间
+
+    private CustomDialog mCustomDialog;//自定义对话框
+    private PickerFragment mPickerFragment;//日期时间选择器
+
+    private String date;//日期
+    private String time;//时间
 
     @Override
     protected int getLayoutId() {
@@ -70,6 +79,94 @@ public class ModifyDataActivity extends BaseActivity {
         initNoteTypesData();
         initSpanner();
         initModifyTime();
+        initPickerFragment();
+        initDialog();
+    }
+
+    /**
+     * 初始化
+     */
+    private void initPickerFragment() {
+        mPickerFragment = new PickerFragment();
+    }
+
+    /**
+     * 初始化对话框
+     */
+    private void initDialog() {
+        mCustomDialog = new CustomDialog(this, R.style.MyDialog);
+        mCustomDialog.setTitle("设置提醒时间")
+                .setContentViewClickListener(new CustomDialog.OnContentViewClickListener() {
+                    @Override
+                    public void onClick(final View view) {
+                        switch (view.getId()) {
+                            case R.id.date:
+                                showDateTimePicker((TextView) view, PickerFragment.DATE_PICKER);
+                                break;
+                            case R.id.time:
+                                showDateTimePicker((TextView) view, PickerFragment.TIME_PICKER);
+                                break;
+                        }
+                    }
+                })
+                .setOkClickListener("保存", new CustomDialog.OnOkClickListener() {
+                    @Override
+                    public void click(View v, String date, String time) {
+                        mTvAlarmClockTime.setText(date + " " + time);
+                        mCustomDialog.dismiss();
+                        //显示体醒时间TextView
+                        mTvAlarmClockTime.setVisibility(View.VISIBLE);
+                    }
+                })
+                .setNoClickListener("取消", new CustomDialog.OnNoClickListener() {
+                    @Override
+                    public void click(View v) {
+                        //注意：不要再dismiss()后做操作
+                        mTvAlarmClockTime.setVisibility(View.GONE);
+                        mCustomDialog.dismiss();
+                    }
+                });
+    }
+
+    /**
+     * 显示时间日期对话框
+     *
+     * @param view
+     * @param flag
+     */
+    private void showDateTimePicker(final TextView view, int flag) {
+        if (flag == PickerFragment.DATE_PICKER) {
+            mPickerFragment.setFlag(PickerFragment.DATE_PICKER);
+        } else {
+            mPickerFragment.setFlag(PickerFragment.TIME_PICKER);
+        }
+        mPickerFragment.setOnTimeSetListener(new PickerFragment.OnSetTimeListener() {
+            @Override
+            public void getTimeSet(int hourOfDay, int minute, String A_PM) {
+                view.setText(formatTime(hourOfDay) + ":" + formatTime(minute) + A_PM);
+            }
+
+            @Override
+            public void getDateSet(DatePicker v, int year, int month, int dayOfMonth) {
+                view.setText(year + "年" + formatTime(month) + "月" + formatTime(dayOfMonth) + "日");
+            }
+        }).show(getSupportFragmentManager(), "DatePicker");
+    }
+
+    /**
+     * 处理时间；使其两位数显示
+     *
+     * @param temp
+     * @return
+     */
+    public String formatTime(int temp) {
+        String str = null;
+        if (temp < 10) {
+            str = "0" + temp;
+        } else {
+            str = "" + temp;
+        }
+        return str;
     }
 
     /**
@@ -113,6 +210,7 @@ public class ModifyDataActivity extends BaseActivity {
 
     /**
      * 初始化Toolbar
+     * // TODO: 2017/5/5  做到这里
      */
     private void initToolbar() {
         setSupportActionBar(mMainToolbar);
@@ -132,16 +230,8 @@ public class ModifyDataActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.alarmClock:
-                if (isAlarmClock) {
-                    //获取当前时间
-                    String format = new SimpleDateFormat("yyyy/MM/dd hh:mm").format(new Date());
-                    mTvAlarmClockTime.setText(format + "");
-                    //显示体醒时间TextView
-                    mTvAlarmClockTime.setVisibility(View.VISIBLE);
-                } else {
-                    mTvAlarmClockTime.setVisibility(View.GONE);
-                }
-                isAlarmClock = !isAlarmClock;
+                //显示选择时间对话框
+                mCustomDialog.show();
                 Toast.makeText(ModifyDataActivity.this, "提醒", Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
@@ -174,4 +264,14 @@ public class ModifyDataActivity extends BaseActivity {
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mCustomDialog != null){
+            mCustomDialog.dismiss();
+            mCustomDialog=null;
+        }
+
+    }
 }

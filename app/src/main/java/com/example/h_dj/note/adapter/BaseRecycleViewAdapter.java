@@ -142,7 +142,7 @@ public abstract class BaseRecycleViewAdapter<T> extends RecyclerView.Adapter<Bas
         }
     }
 
-    //// TODO: 2017/3/28
+
     //定义一个接口用来ItemView的点击事件
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
