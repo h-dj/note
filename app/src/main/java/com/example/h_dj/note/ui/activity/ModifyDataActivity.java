@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -78,7 +77,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     private EditTextUtils mEditTextUtils;//使EditText显示图片的utils
 
-    private InputMethodManager manager; //软键盘服务
+
     private String date;//日期
     private String time;//时间
 
@@ -95,11 +94,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         mEtTitle.setOnFocusChangeListener(this);
 
         mEditTextUtils = EditTextUtils.getInstance();
-        //获取软键盘服务
-        manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        //默认关闭软件盘
-        mEtTitle.clearFocus();
-        manager.hideSoftInputFromWindow(mEtTitle.getWindowToken(), 0);
+
         initToolbar();
         initNoteTypesData();
         initSpanner();
@@ -340,10 +335,10 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
             //显示软键盘
-            manager.showSoftInput(v, 0);
+            showSoftwareInput(v);
         } else {
             //隐藏软键盘
-            manager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            hiddenSoftwareInput(v);
         }
     }
 
