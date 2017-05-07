@@ -18,7 +18,7 @@ public class SearchAdapter extends BaseRecycleViewAdapter {
     }
 
     @Override
-    protected void convert(MyViewHolder holder, Object o) {
+    protected void convert(MyViewHolder holder, Object o,int position) {
         holder.setText(R.id.item_title, (String) o);
     }
 }

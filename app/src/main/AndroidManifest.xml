@@ -23,7 +23,9 @@
         <!--搜索页面-->
         <activity android:name=".ui.activity.SearchResultActivity"/>
         <!--修改页面-->
-        <activity android:name=".ui.activity.ModifyDataActivity"/>
+        <activity
+            android:name=".ui.activity.ModifyDataActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
 
         <!--内容提供这-->
         <provider

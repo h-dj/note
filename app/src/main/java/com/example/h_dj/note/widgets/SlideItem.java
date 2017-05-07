@@ -3,7 +3,6 @@ package com.example.h_dj.note.widgets;
 import android.content.Context;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,7 +126,7 @@ public class SlideItem extends ViewGroup {
          */
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
-            Log.e(this.getClass().getSimpleName(), "tryCaptureView: ");
+//            Log.e(this.getClass().getSimpleName(), "tryCaptureView: ");
             return child == mContent || child == mButton;
         }
 
@@ -140,7 +139,7 @@ public class SlideItem extends ViewGroup {
          */
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            Log.e(this.getClass().getSimpleName(), "onViewReleased: ");
+//            Log.e(this.getClass().getSimpleName(), "onViewReleased: ");
             //位置归正的left
             int left = mContent.getLeft();
             //获取content
@@ -183,7 +182,7 @@ public class SlideItem extends ViewGroup {
          */
         @Override
         public int clampViewPositionHorizontal(View child, int left, int dx) {
-            Log.e(this.getClass().getSimpleName(), "clampViewPositionHorizontal: " + left + ":" + mButtonWidth);
+//            Log.e(this.getClass().getSimpleName(), "clampViewPositionHorizontal: " + left + ":" + mButtonWidth);
             //处理越界问题
             if (child == mContent) {
                 if (left > 0) {
@@ -218,7 +217,7 @@ public class SlideItem extends ViewGroup {
          */
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-            Log.e(this.getClass().getSimpleName(), "onViewPositionChanged: " + left);
+//            Log.e(this.getClass().getSimpleName(), "onViewPositionChanged: " + left);
             invalidate();
             //如果被捕捉的view是Content;则对Button的位置进行调整；
             if (changedView == mContent) {

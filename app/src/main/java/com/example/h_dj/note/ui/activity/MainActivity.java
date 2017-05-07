@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.example.h_dj.note.R;
+import com.example.h_dj.note.ui.fragment.AllNoteFragment;
 import com.example.h_dj.note.ui.fragment.DailyFragment;
 import com.example.h_dj.note.ui.fragment.EntertainmentFragment;
 import com.example.h_dj.note.ui.fragment.StudyFragment;
@@ -28,7 +29,6 @@ import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
 
-
     @BindView(R.id.main_toolbar)
     Toolbar mMainToolbar;
     @BindView(R.id.main_fl)
@@ -39,6 +39,11 @@ public class MainActivity extends BaseActivity {
     NavigationView mNav;
     @BindView(R.id.activity_main)
     DrawerLayout mActivityMain;
+
+    private static final int ALL = 0; //全部便签
+    private static final int DAILY = 1; //日常便签
+    private static final int STUDY = 2;
+    private static final int ENTERTAINMENT = 3;
 
 
     private List<Fragment> mFragments;
@@ -65,9 +70,10 @@ public class MainActivity extends BaseActivity {
      * 初始化fragement布局
      */
     private void initFragment() {
-        mFragments.add(new DailyFragment());//0
-        mFragments.add(new StudyFragment());//1
-        mFragments.add(new EntertainmentFragment());//2
+        mFragments.add(new AllNoteFragment());//0
+        mFragments.add(new DailyFragment());//1
+        mFragments.add(new StudyFragment());//2
+        mFragments.add(new EntertainmentFragment());//3
 
     }
 
@@ -84,7 +90,22 @@ public class MainActivity extends BaseActivity {
         mNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+                switch (item.getItemId()) {
+                    case R.id.daily:
+                        position = DAILY;
+                        break;
+                    case R.id.study:
+                        position = STUDY;
+                        break;
+                    case R.id.entertainment:
+                        position = ENTERTAINMENT;
+                        break;
+                    default:
+                        position = ALL;
+                        break;
+                }
+                //设置fragment
+                setFragment();
                 //关闭菜单
                 mActivityMain.closeDrawer(GravityCompat.START);
                 return true;

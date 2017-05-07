@@ -8,4 +8,6 @@ import com.example.h_dj.note.bean.Note;
 
 public interface ModifyPresenter {
     void AddData(Note note);
+
+    void queryData(int noteId);
 }

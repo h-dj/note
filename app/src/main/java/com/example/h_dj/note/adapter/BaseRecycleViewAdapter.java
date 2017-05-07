@@ -2,7 +2,6 @@ package com.example.h_dj.note.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +39,7 @@ public abstract class BaseRecycleViewAdapter<T> extends RecyclerView.Adapter<Bas
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        convert(holder, mList.get(position));
+        convert(holder, mList.get(position), position);
 
         //设置ItemView单击事件
         if (mOnItemClickListener != null) {
@@ -67,7 +66,7 @@ public abstract class BaseRecycleViewAdapter<T> extends RecyclerView.Adapter<Bas
      * @param holder
      * @param t
      */
-    protected abstract void convert(MyViewHolder holder, T t);  //绑定数据
+    protected abstract void convert(MyViewHolder holder, T t, int position);  //绑定数据
 
 
     @Override
@@ -124,7 +123,7 @@ public abstract class BaseRecycleViewAdapter<T> extends RecyclerView.Adapter<Bas
          * @param content
          */
         public void setText(int ViewId, String content) {
-            Log.i(TAG, "setText: " + ViewId);
+//            Log.i(TAG, "setText: " + ViewId);
             TextView tv = getView(ViewId);
             tv.setText(content);
         }

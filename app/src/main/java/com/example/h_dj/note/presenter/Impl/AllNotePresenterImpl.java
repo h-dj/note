@@ -5,9 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.example.h_dj.note.bean.Note;
-import com.example.h_dj.note.presenter.DailyPresenter;
+import com.example.h_dj.note.presenter.AllNotePresenter;
 import com.example.h_dj.note.utils.NotesUtils;
-import com.example.h_dj.note.view.DailyFragmentView;
+import com.example.h_dj.note.view.AllNoteFragmentView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +16,12 @@ import java.util.List;
  * Created by H_DJ on 2017/5/7.
  */
 
-public class DailyPresenterImpl implements DailyPresenter {
+public class AllNotePresenterImpl implements AllNotePresenter {
 
     private Context mContext;
-    private DailyFragmentView mView;
+    private AllNoteFragmentView mView;
 
-    public DailyPresenterImpl(Context context, DailyFragmentView view) {
+    public AllNotePresenterImpl(Context context, AllNoteFragmentView view) {
         mContext = context;
         mView = view;
     }
@@ -30,7 +30,7 @@ public class DailyPresenterImpl implements DailyPresenter {
     public void loadDailyData() {
         //获取内容解析者
         ContentResolver resolver = mContext.getContentResolver();
-        Cursor query = resolver.query(NotesUtils.Note.NOTES_CONTENT_URL, null, NotesUtils.Note.NOTE_TYPE + " like ?", new String[]{"日常"}, null);
+        Cursor query = resolver.query(NotesUtils.Note.NOTES_CONTENT_URL, null, null, null, null);
         List<Note> notes = converCursorToList(query);
         if (notes.size() > 0) {
             mView.loadDataSuccess(notes);
@@ -39,6 +39,7 @@ public class DailyPresenterImpl implements DailyPresenter {
         }
 
     }
+
 
     /**
      * 把游标转换为List

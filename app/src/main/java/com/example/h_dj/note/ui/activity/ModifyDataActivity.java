@@ -78,6 +78,8 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     //P层引用
     private ModifyPresenter mPresenter;
+    private Intent mIntent;
+
 
     @Override
     protected int getLayoutId() {
@@ -87,13 +89,17 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     @Override
     public void init() {
         super.init();
+        mIntent = getIntent();
         mNote = new Note();
-
         //设置EditText获取焦点；软键盘显示或隐藏问题
         mEtModifyContent.setOnFocusChangeListener(this);
         mEtTitle.setOnFocusChangeListener(this);
         mEditTextUtils = EditTextUtils.getInstance();
         mPresenter = new ModifyPresenterImpl(getApplicationContext(), this);
+        if (mIntent != null) {
+            int noteId = mIntent.getIntExtra("noteId", -1);
+            mPresenter.queryData(noteId);
+        }
         initToolbar();
         initNoteTypesData();
         initSpanner();
@@ -132,21 +138,35 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                 .setOkClickListener("保存", new CustomDialog.OnOkClickListener() {
                     @Override
                     public void click(View v, String date, String time) {
-                        mTvAlarmClockTime.setText(date + " " + time);
+                        showAlarmTime(date + " " + time, true);
                         mCustomDialog.dismiss();
-                        //显示体醒时间TextView
-                        mTvAlarmClockTime.setVisibility(View.VISIBLE);
-                        mNote.setAlarm(true);
                     }
                 })
                 .setNoClickListener("取消", new CustomDialog.OnNoClickListener() {
                     @Override
                     public void click(View v) {
+                        showAlarmTime(null, false);
                         mCustomDialog.dismiss();
-                        mTvAlarmClockTime.setVisibility(View.GONE);
-                        mNote.setAlarm(false);
                     }
                 });
+    }
+
+    /**
+     * 是否显示提醒时间
+     *
+     * @param time
+     * @param isShow
+     */
+    private void showAlarmTime(String time, boolean isShow) {
+        if (isShow) {
+            //显示体醒时间TextView
+            mTvAlarmClockTime.setVisibility(View.VISIBLE);
+            mTvAlarmClockTime.setText(time);
+            mNote.setAlarm(true);
+        } else {
+            mTvAlarmClockTime.setVisibility(View.GONE);
+            mNote.setAlarm(false);
+        }
     }
 
     /**
@@ -195,7 +215,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
      */
     private void initModifyTime() {
         //获取当前时间
-        if (mNote.getModifyTime() == null) {
+        if (TextUtils.isEmpty(mNote.getModifyTime())) {
             String string = DateUtils.Date2String(new Date(), "yyyy-MM-dd HH:mm");
             mNote.setModifyTime(string);
         }
@@ -207,6 +227,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
      */
     private void initNoteTypesData() {
         noteTypes = new ArrayList<>();
+        noteTypes.add("全部");
         noteTypes.add("日常");
         noteTypes.add("学习");
         noteTypes.add("娱乐");
@@ -264,7 +285,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                 break;
             case R.id.save:
                 fillNoteData();
-                mPresenter.AddData(mNote);
+
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -289,6 +310,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         String noteNontent = mEtModifyContent.getText().toString();
         mNote.setNoteContent(noteNontent);
 
+        mPresenter.AddData(mNote);
         LogUtil.e(mNote.toString());
     }
 
@@ -367,7 +389,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     @Override
     public void empty(String s) {
-
+        Toast.makeText(ModifyDataActivity.this, "" + s, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -379,5 +401,14 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     @Override
     public void failed() {
         Toast.makeText(ModifyDataActivity.this, "失败", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setData(List<Note> notes) {
+        mNote = notes.get(0);
+        mEtTitle.setText(mNote.getNoteTitle());
+        mEditTextUtils.updataContent(mEtModifyContent, mNote.getNoteContent());
+        mSpType.setPrompt(mNote.getNoteType());
+        showAlarmTime(mNote.getAlarmTime(), mNote.isAlarm());
     }
 }

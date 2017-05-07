@@ -6,7 +6,9 @@
     android:orientation="vertical">
 
 
-    <include layout="@layout/item_content"/>
+    <include
+        android:id="@+id/item_content"
+        layout="@layout/item_content"/>
 
     <include layout="@layout/item_menu"/>
 
