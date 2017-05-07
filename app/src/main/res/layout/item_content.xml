@@ -28,7 +28,7 @@
             android:textSize="20sp"/>
 
         <TextView
-            android:id="@+id/modifyTime"
+            android:id="@+id/item_modifyTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="修改时间：05/03 22:56"/>
@@ -36,7 +36,7 @@
 
 
     <TextView
-        android:id="@+id/alarmClock"
+        android:id="@+id/item_alarmClock"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_alignParentRight="true"
@@ -45,10 +45,10 @@
         android:drawableLeft="@drawable/clock_alarm"
         android:drawablePadding="5dp"
         android:gravity="center"
-        android:text="@string/alarmClock"/>
+        />
 
     <ImageView
-        android:id="@+id/mark"
+        android:id="@+id/item_mark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

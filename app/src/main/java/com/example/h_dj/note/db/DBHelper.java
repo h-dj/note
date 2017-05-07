@@ -26,13 +26,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE [notes](" +
+        String sql = "CREATE TABLE " + TABLE_NAME + "(" +
                 "    noteId INTEGER PRIMARY KEY NOT NULL," +
                 "    noteTitle NVARCHAR NOT NULL," +
                 "    noteType NVARCHAR NOT NULL," +
                 "    modifyTime VARCHAR NOT NULL," +
                 "    alarmTime VARCHAR," +
-                "    isAlarm BOOLEAN NOT NULL,"+
+                "    isAlarm BOOLEAN NOT NULL," +
                 "    isMark BOOLEAN," +
                 "    noteContent NVARCHAR NOT NULL);";
         db.execSQL(sql);
