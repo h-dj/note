@@ -20,7 +20,7 @@ import butterknife.BindView;
 /**
  * Created by H_DJ on 2017/5/7.
  */
-
+// TODO: 2017/5/7
 public class AllNoteFragment extends BaseFragment implements AllNoteFragmentView, OnEditListener {
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
