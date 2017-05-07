@@ -73,7 +73,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
      */
     private void setCurrentTime() {
         //希望格式化时间为12小时制的，则使用hh:mm:ss 如果希望格式化时间为24小时制的，则使用HH:mm:ss
-        String currentTime = new SimpleDateFormat("yyyy年MM月dd日 HH:mm").format(new Date());
+        String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
         String[] split = currentTime.split("\\s");
         date.setText(split[0] + "");
         time.setText(split[1] + "");

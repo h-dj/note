@@ -20,12 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.h_dj.note.R;
+import com.example.h_dj.note.bean.Note;
+import com.example.h_dj.note.presenter.Impl.ModifyPresenterImpl;
+import com.example.h_dj.note.presenter.ModifyPresenter;
+import com.example.h_dj.note.utils.DateUtils;
 import com.example.h_dj.note.utils.EditTextUtils;
 import com.example.h_dj.note.utils.LogUtil;
+import com.example.h_dj.note.view.ModifyView;
 import com.example.h_dj.note.widgets.CustomDialog;
 import com.example.h_dj.note.widgets.PickerFragment;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,10 +41,7 @@ import butterknife.OnClick;
  * Created by H_DJ on 2017/5/5.
  */
 
-public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener {
-
-
-    private static final int TAKE_PICTURE = 1; //选择图片的requestCode
+public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener, ModifyView {
     @BindView(R.id.main_toolbar)
     Toolbar mMainToolbar;
     @BindView(R.id.et_modify_content)
@@ -64,22 +65,19 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     @BindView(R.id.sll)
     ScrollView mSll;
 
-
+    private static final int TAKE_PICTURE = 1; //选择图片的requestCode
     /**
      * Note类型
      */
     private List<String> noteTypes;
-
-    private boolean isAlarmClock = false; //是否设置提醒时间
+    private Note mNote;
 
     private CustomDialog mCustomDialog;//自定义对话框
     private PickerFragment mPickerFragment;//日期时间选择器
-
     private EditTextUtils mEditTextUtils;//使EditText显示图片的utils
 
-
-    private String date;//日期
-    private String time;//时间
+    //P层引用
+    private ModifyPresenter mPresenter;
 
     @Override
     protected int getLayoutId() {
@@ -89,20 +87,19 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     @Override
     public void init() {
         super.init();
+        mNote = new Note();
+
         //设置EditText获取焦点；软键盘显示或隐藏问题
         mEtModifyContent.setOnFocusChangeListener(this);
         mEtTitle.setOnFocusChangeListener(this);
-
         mEditTextUtils = EditTextUtils.getInstance();
-
+        mPresenter = new ModifyPresenterImpl(getApplicationContext(), this);
         initToolbar();
         initNoteTypesData();
         initSpanner();
         initModifyTime();
         initPickerFragment();
         initDialog();
-
-
     }
 
 
@@ -139,6 +136,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                         mCustomDialog.dismiss();
                         //显示体醒时间TextView
                         mTvAlarmClockTime.setVisibility(View.VISIBLE);
+                        mNote.setAlarm(true);
                     }
                 })
                 .setNoClickListener("取消", new CustomDialog.OnNoClickListener() {
@@ -146,7 +144,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                     public void click(View v) {
                         mCustomDialog.dismiss();
                         mTvAlarmClockTime.setVisibility(View.GONE);
-
+                        mNote.setAlarm(false);
                     }
                 });
     }
@@ -166,12 +164,12 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         mPickerFragment.setOnTimeSetListener(new PickerFragment.OnSetTimeListener() {
             @Override
             public void getTimeSet(int hourOfDay, int minute, String A_PM) {
-                view.setText(formatTime(hourOfDay) + ":" + formatTime(minute) + A_PM);
+                view.setText(formatTime(hourOfDay) + ":" + formatTime(minute));
             }
 
             @Override
             public void getDateSet(DatePicker v, int year, int month, int dayOfMonth) {
-                view.setText(year + "年" + formatTime(month) + "月" + formatTime(dayOfMonth) + "日");
+                view.setText(year + "-" + formatTime(month) + "-" + formatTime(dayOfMonth));
             }
         }).show(getSupportFragmentManager(), "DatePicker");
     }
@@ -197,8 +195,11 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
      */
     private void initModifyTime() {
         //获取当前时间
-        String format = new SimpleDateFormat("yyyy/MM/dd HH:mm").format(new Date());
-        mTvModifyTime.setText(format);
+        if (mNote.getModifyTime() == null) {
+            String string = DateUtils.Date2String(new Date(), "yyyy-MM-dd HH:mm");
+            mNote.setModifyTime(string);
+        }
+        mTvModifyTime.setText(mNote.getModifyTime());
     }
 
     /**
@@ -221,6 +222,8 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(ModifyDataActivity.this, "" + noteTypes.get(position).toString(), Toast.LENGTH_SHORT).show();
+                //设置便签类别
+                mNote.setNoteType(noteTypes.get(position));
             }
 
             @Override
@@ -260,14 +263,33 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                 this.finish();
                 break;
             case R.id.save:
-                String string = mEtModifyContent.getText().toString();
-                LogUtil.e(string + "");
+                fillNoteData();
+                mPresenter.AddData(mNote);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
         return true;
 
+    }
+
+    /**
+     * 填充Note数据
+     */
+    public void fillNoteData() {
+        //设置标题
+        mNote.setNoteTitle(mEtTitle.getText().toString().trim());
+        //设置提醒时间
+        String AlarmTime = mTvAlarmClockTime.getText().toString().trim();
+        if (mNote.isAlarm()) {
+            mNote.setAlarmTime(AlarmTime);
+        } else {
+            mNote.setAlarmTime(null);
+        }
+        String noteNontent = mEtModifyContent.getText().toString();
+        mNote.setNoteContent(noteNontent);
+
+        LogUtil.e(mNote.toString());
     }
 
     @OnClick({R.id.tv_video, R.id.tv_photo, R.id.tv_voice, R.id.tv_doodle})
@@ -343,4 +365,19 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     }
 
 
+    @Override
+    public void empty(String s) {
+
+    }
+
+    @Override
+    public void successfully() {
+        Toast.makeText(ModifyDataActivity.this, "成功", Toast.LENGTH_SHORT).show();
+        this.finish();
+    }
+
+    @Override
+    public void failed() {
+        Toast.makeText(ModifyDataActivity.this, "失败", Toast.LENGTH_SHORT).show();
+    }
 }

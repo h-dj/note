@@ -1,7 +1,5 @@
 package com.example.h_dj.note.bean;
 
-import java.util.Date;
-
 /**
  * Created by H_DJ on 2017/5/6.
  */
@@ -11,11 +9,19 @@ public class Note {
     private String noteId;//便签id
     private String noteTitle;//便签标题
     private String noteType;//类型
-    private Date modifyTime;//修改时间
-    private Date alarmTime;//提醒时间；可以为空
+    private String modifyTime;//修改时间
+    private String alarmTime;//提醒时间；可以为空
+    private boolean isAlarm;//是否设置提醒
     private boolean isMark;//是否添加类星号 可以为空
     private String noteContent;//内容
 
+    public boolean isAlarm() {
+        return isAlarm;
+    }
+
+    public void setAlarm(boolean alarm) {
+        isAlarm = alarm;
+    }
 
     public String getNoteId() {
         return noteId;
@@ -41,19 +47,19 @@ public class Note {
         this.noteType = noteType;
     }
 
-    public Date getModifyTime() {
+    public String getModifyTime() {
         return modifyTime;
     }
 
-    public void setModifyTime(Date modifyTime) {
+    public void setModifyTime(String modifyTime) {
         this.modifyTime = modifyTime;
     }
 
-    public Date getAlarmTime() {
+    public String getAlarmTime() {
         return alarmTime;
     }
 
-    public void setAlarmTime(Date alarmTime) {
+    public void setAlarmTime(String alarmTime) {
         this.alarmTime = alarmTime;
     }
 
@@ -74,4 +80,17 @@ public class Note {
     }
 
 
+    @Override
+    public String toString() {
+        return "Note{" +
+                "noteId='" + noteId + '\'' +
+                ", noteTitle='" + noteTitle + '\'' +
+                ", noteType='" + noteType + '\'' +
+                ", modifyTime=" + modifyTime +
+                ", alarmTime=" + alarmTime +
+                ", isAlarm=" + isAlarm +
+                ", isMark=" + isMark +
+                ", noteContent='" + noteContent + '\'' +
+                '}';
+    }
 }

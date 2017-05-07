@@ -30,8 +30,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "    noteId INTEGER PRIMARY KEY NOT NULL," +
                 "    noteTitle NVARCHAR NOT NULL," +
                 "    noteType NVARCHAR NOT NULL," +
-                "    modifyTime DATETIME NOT NULL," +
-                "    alarmTime DATETIME," +
+                "    modifyTime VARCHAR NOT NULL," +
+                "    alarmTime VARCHAR," +
+                "    isAlarm BOOLEAN NOT NULL,"+
                 "    isMark BOOLEAN," +
                 "    noteContent NVARCHAR NOT NULL);";
         db.execSQL(sql);
