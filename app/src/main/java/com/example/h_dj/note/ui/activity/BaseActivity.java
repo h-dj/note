@@ -54,20 +54,22 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        LogUtil.e(this.getClass().getSimpleName() + " onStart");
         super.onStart();
+        LogUtil.e(this.getClass().getSimpleName() + " onStart");
     }
 
     @Override
     protected void onStop() {
-        LogUtil.e(this.getClass().getSimpleName() + "  onStop");
         super.onStop();
+        LogUtil.e(this.getClass().getSimpleName() + "  onStop");
+
     }
 
     @Override
     protected void onPause() {
-        LogUtil.w(this.getClass().getSimpleName() + " onPause");
         super.onPause();
+        LogUtil.w(this.getClass().getSimpleName() + " onPause");
+
     }
 
     @Override

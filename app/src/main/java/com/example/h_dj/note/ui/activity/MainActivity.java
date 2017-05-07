@@ -70,6 +70,7 @@ public class MainActivity extends BaseActivity {
      * 初始化fragement布局
      */
     private void initFragment() {
+        mFragments.clear();
         mFragments.add(new AllNoteFragment());//0
         mFragments.add(new DailyFragment());//1
         mFragments.add(new StudyFragment());//2
@@ -185,7 +186,7 @@ public class MainActivity extends BaseActivity {
             if (fragment.isAdded()) {
                 fragmentTransaction.hide(currentFragment).show(fragment).commitAllowingStateLoss();
             } else {
-                fragmentTransaction.hide(currentFragment).add(R.id.main_fl, fragment).commitAllowingStateLoss();
+                fragmentTransaction.hide(currentFragment).add(R.id.main_fl, fragment).commit();
             }
             currentFragment = fragment;
         }
@@ -194,5 +195,13 @@ public class MainActivity extends BaseActivity {
     @OnClick(R.id.main_fab)
     public void onViewClicked() {
         goTo(ModifyDataActivity.class);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mFragments != null) {
+            mFragments = null;
+        }
     }
 }

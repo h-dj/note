@@ -12,4 +12,6 @@ public interface AllNoteFragmentView {
     void loadDataSuccess(List<Note> notes);
 
     void failed();
+
+    void delSuccess();
 }

@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.h_dj.note.widgets.SlideItem
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    >
 
+    <com.example.h_dj.note.widgets.SlideItem
+        android:layout_width="match_parent"
+        android:id="@+id/item_slide"
+        android:layout_height="60dp">
 
-    <include
-        android:id="@+id/item_content"
-        layout="@layout/item_content"/>
+        <include
+            android:id="@+id/item_content"
+            layout="@layout/item_content"/>
 
-    <include layout="@layout/item_menu"/>
-
-</com.example.h_dj.note.widgets.SlideItem>
+        <include layout="@layout/item_menu"/>
+    </com.example.h_dj.note.widgets.SlideItem>
+</LinearLayout>

@@ -40,6 +40,8 @@ public class DailyFragment extends BaseFragment implements OnEditListener {
         RefreshData();
     }
 
+
+
     @Override
     public void init() {
         super.init();
@@ -60,12 +62,12 @@ public class DailyFragment extends BaseFragment implements OnEditListener {
 
     @Override
     public void delete(int position) {
-
+        RefreshData();
     }
 
     @Override
     public void edit(int position) {
-
+        RefreshData();
     }
 
 

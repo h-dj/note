@@ -43,6 +43,9 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogUtil.e("onCreate");
+
+
     }
 
     @Nullable
@@ -108,6 +111,10 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         unbinder.unbind();
+        if (rootView != null){
+            rootView = null;
+        }
+        LogUtil.e("onDestroyView");
         super.onDestroyView();
     }
 

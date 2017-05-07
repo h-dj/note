@@ -6,4 +6,6 @@ package com.example.h_dj.note.presenter;
 
 public interface AllNotePresenter {
     void loadDailyData();
+
+    void del(String noteId);
 }

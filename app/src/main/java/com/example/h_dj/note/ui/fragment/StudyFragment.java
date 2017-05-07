@@ -59,11 +59,12 @@ public class StudyFragment extends BaseFragment implements OnEditListener{
 
     @Override
     public void delete(int position) {
-
+        RefreshData();
     }
 
     @Override
     public void edit(int position) {
-
+        RefreshData();
     }
+
 }

@@ -3,9 +3,11 @@ package com.example.h_dj.note.presenter.Impl;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 
 import com.example.h_dj.note.bean.Note;
 import com.example.h_dj.note.presenter.AllNotePresenter;
+import com.example.h_dj.note.utils.LogUtil;
 import com.example.h_dj.note.utils.NotesUtils;
 import com.example.h_dj.note.view.AllNoteFragmentView;
 
@@ -38,6 +40,19 @@ public class AllNotePresenterImpl implements AllNotePresenter {
             mView.failed();
         }
 
+    }
+
+    @Override
+    public void del(String noteId) {
+        ContentResolver resolver = mContext.getContentResolver();
+        Uri uri = Uri.parse(NotesUtils.Note.NOTE_CONTENT_URL.toString() + "/" + noteId);
+        int delete = resolver.delete(uri, "noteId = ?", new String[]{noteId});
+        if (delete > 0) {
+            mView.delSuccess();
+        } else {
+            LogUtil.e(delete + ":" + noteId);
+            mView.failed();
+        }
     }
 
 

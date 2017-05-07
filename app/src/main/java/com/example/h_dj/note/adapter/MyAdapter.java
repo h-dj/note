@@ -17,7 +17,7 @@ import java.util.ListIterator;
  * Created by H_DJ on 2017/5/3.
  */
 
-public class MyAdapter extends BaseRecycleViewAdapter<Note> implements SlideItem.OnItemCloseListener {
+public class MyAdapter extends BaseRecycleViewAdapter<Note> implements SlideItem.OnItemCloseListener{
 
 
     private List<SlideItem> mSlideDeleteViews;
@@ -31,13 +31,9 @@ public class MyAdapter extends BaseRecycleViewAdapter<Note> implements SlideItem
 
     @Override
     protected void convert(final MyViewHolder holder, final Note note, final int position) {
-        //item的点击事件
-        holder.getView(R.id.item_content).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOnEditListener.edit(position);
-            }
-        });
+
+
+
         //设置标题
         holder.setText(R.id.item_title, note.getNoteTitle());
         //设置修改时间
@@ -60,19 +56,17 @@ public class MyAdapter extends BaseRecycleViewAdapter<Note> implements SlideItem
         });
 
         //设置关闭事件
-        ((SlideItem) holder.mConveryView).setOnItemCloseListener(this);
-
-        //设置侧滑menu的单击事件
-        ((SlideItem) holder.mConveryView).setOnItemMenuClickListener(new SlideItem.OnItemMenuClickListener() {
+        ((SlideItem) holder.getView(R.id.item_slide)).setOnItemCloseListener(this);
+        holder.getView(R.id.tv_del).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                closeToAll();
-                switch (view.getId()) {
-                    case R.id.tv_del:
-//                        Toast.makeText(mContext, "删除按钮被单击", Toast.LENGTH_SHORT).show();
-                        mOnEditListener.delete(position);
-                        break;
-                }
+            public void onClick(View v) {
+                mOnEditListener.delete(position);
+            }
+        });
+        holder.getView(R.id.tv_edit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOnEditListener.edit(position);
             }
         });
 
@@ -101,5 +95,6 @@ public class MyAdapter extends BaseRecycleViewAdapter<Note> implements SlideItem
     public void close(SlideItem slideItem) {
         mSlideDeleteViews.remove(slideItem);
     }
+
 
 }

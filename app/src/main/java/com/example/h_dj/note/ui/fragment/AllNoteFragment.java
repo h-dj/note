@@ -35,9 +35,9 @@ public class AllNoteFragment extends BaseFragment implements AllNoteFragmentView
         return R.layout.fragment_;
     }
 
+
     @Override
     public void init() {
-        super.init();
         mPresenter = new AllNotePresenterImpl(mContext, this);
         mMyAdapter = new MyAdapter(mContext, R.layout.item_main, mNotes, this);
         initRecyclerView(mRecyclerView, mMyAdapter);
@@ -64,15 +64,24 @@ public class AllNoteFragment extends BaseFragment implements AllNoteFragmentView
         Toast.makeText(mContext, "没有数据", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void delSuccess() {
+        mPresenter.loadDailyData();
+    }
+
 
     @Override
     public void delete(int position) {
-
+//        Toast.makeText(mContext, "删除", Toast.LENGTH_SHORT).show();
+        String noteId = mNotes.get(position).getNoteId();
+        mPresenter.del(noteId);
     }
 
     @Override
     public void edit(int position) {
-        int noteId = Integer.parseInt(mNotes.get(position).getNoteId());
-        goTo(ModifyDataActivity.class, noteId);
+//        Toast.makeText(mContext, "修改", Toast.LENGTH_SHORT).show();
+        String noteId = mNotes.get(position).getNoteId();
+        goTo(ModifyDataActivity.class, Integer.parseInt(noteId));
     }
+
 }

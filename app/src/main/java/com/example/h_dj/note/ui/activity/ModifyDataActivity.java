@@ -242,7 +242,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         mSpType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(ModifyDataActivity.this, "" + noteTypes.get(position).toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ModifyDataActivity.this, "" + noteTypes.get(position).toString(), Toast.LENGTH_SHORT).show();
                 //设置便签类别
                 mNote.setNoteType(noteTypes.get(position));
             }

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -234,5 +235,22 @@ public class EditTextUtils implements View.OnFocusChangeListener, View.OnClickLi
         updataContent(editText, content);
     }
 
+    /**
+     * 获取内容中的图片路径
+     *
+     * @param view
+     * @param content
+     * @return
+     */
+    public String setBitmapPath(ImageView view, String content) {
+        //解析出显示图片的路径
+        int imgStartIndex = content.lastIndexOf(imgStartTag);
+        int imgEndIndex = content.lastIndexOf(imgEndTag);
+        if (imgStartIndex < 0) {
+            return null;
+        }
+        String str = content.substring(imgStartTag.length(), imgEndIndex);
+        return str;
+    }
 
 }

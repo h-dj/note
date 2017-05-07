@@ -26,15 +26,16 @@ public class SlideItem extends ViewGroup {
     private ViewDragHelper mViewDragHelper;
 
     public SlideItem(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public SlideItem(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public SlideItem(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.setFocusable(true);
     }
 
     /**
@@ -45,21 +46,20 @@ public class SlideItem extends ViewGroup {
 //        super.onFinishInflate();
         mContent = getChildAt(0);
         mButton = getChildAt(1);
-
-        /**
-         * 设置侧滑菜单的单击事件
-         */
-        for (int i = 0; i < ((ViewGroup) mButton).getChildCount(); i++) {
-            ((ViewGroup) mButton).getChildAt(i).setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mListener != null) {
-                        mListener.onClick(v);
-                    }
-
-                }
-            });
-        }
+//        /**
+//         * 设置侧滑菜单的单击事件
+//         */
+//        for (int i = 0; i < ((ViewGroup) mButton).getChildCount(); i++) {
+//            ((ViewGroup) mButton).getChildAt(i).setOnClickListener(new OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (mListener != null) {
+//                        mListener.onClick(v);
+//                    }
+//
+//                }
+//            });
+//        }
 
         mViewDragHelper = ViewDragHelper.create(this, new MyViewDragHelperCall());
     }
@@ -260,18 +260,18 @@ public class SlideItem extends ViewGroup {
         return true;
     }
 
-    /**
-     * 设置侧滑菜单的单击接口
-     */
-    private OnItemMenuClickListener mListener;
-
-    public void setOnItemMenuClickListener(OnItemMenuClickListener listener) {
-        mListener = listener;
-    }
-
-    public interface OnItemMenuClickListener {
-        void onClick(View view);
-    }
+//    /**
+//     * 设置侧滑菜单的单击接口
+//     */
+//    private OnItemMenuClickListener mListener;
+//
+//    public void setOnItemMenuClickListener(OnItemMenuClickListener listener) {
+//        mListener = listener;
+//    }
+//
+//    public interface OnItemMenuClickListener {
+//        void onClick(View view);
+//    }
 
 
     /**

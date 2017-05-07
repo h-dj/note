@@ -61,11 +61,13 @@ public class EntertainmentFragment extends BaseFragment implements OnEditListene
 
     @Override
     public void delete(int position) {
-
+        RefreshData();
     }
 
     @Override
     public void edit(int position) {
-
+        RefreshData();
     }
+
+
 }
