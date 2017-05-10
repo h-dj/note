@@ -34,6 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "    alarmTime VARCHAR," +
                 "    isAlarm BOOLEAN NOT NULL," +
                 "    isMark BOOLEAN," +
+                "    isDel INT DEFAULT 0," +
                 "    noteContent NVARCHAR NOT NULL);";
         db.execSQL(sql);
     }

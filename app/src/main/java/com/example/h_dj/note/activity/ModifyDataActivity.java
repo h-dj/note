@@ -1,9 +1,9 @@
-package com.example.h_dj.note.ui.activity;
+package com.example.h_dj.note.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,8 +17,10 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.h_dj.note.Listener.IListener;
+import com.example.h_dj.note.Listener.ListenerManager;
+import com.example.h_dj.note.Listener.ModifyView;
 import com.example.h_dj.note.R;
 import com.example.h_dj.note.bean.Note;
 import com.example.h_dj.note.presenter.Impl.ModifyPresenterImpl;
@@ -26,7 +28,6 @@ import com.example.h_dj.note.presenter.ModifyPresenter;
 import com.example.h_dj.note.utils.DateUtils;
 import com.example.h_dj.note.utils.EditTextUtils;
 import com.example.h_dj.note.utils.LogUtil;
-import com.example.h_dj.note.view.ModifyView;
 import com.example.h_dj.note.widgets.CustomDialog;
 import com.example.h_dj.note.widgets.PickerFragment;
 
@@ -41,7 +42,7 @@ import butterknife.OnClick;
  * Created by H_DJ on 2017/5/5.
  */
 
-public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener, ModifyView {
+public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener, IListener, ModifyView {
     @BindView(R.id.main_toolbar)
     Toolbar mMainToolbar;
     @BindView(R.id.et_modify_content)
@@ -79,7 +80,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     //P层引用
     private ModifyPresenter mPresenter;
     private Intent mIntent;
-
+    private int position;
 
     @Override
     protected int getLayoutId() {
@@ -89,6 +90,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     @Override
     public void init() {
         super.init();
+        ListenerManager.getInstance().registerListtener(this);
         mIntent = getIntent();
         mNote = new Note();
         //设置EditText获取焦点；软键盘显示或隐藏问题
@@ -96,16 +98,34 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         mEtTitle.setOnFocusChangeListener(this);
         mEditTextUtils = EditTextUtils.getInstance();
         mPresenter = new ModifyPresenterImpl(getApplicationContext(), this);
-        if (mIntent != null) {
-            int noteId = mIntent.getIntExtra("noteId", -1);
-            mPresenter.queryData(noteId);
-        }
+        setData();
         initToolbar();
         initNoteTypesData();
         initSpanner();
         initModifyTime();
         initPickerFragment();
         initDialog();
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void setData() {
+
+        if (mIntent != null) {
+            Bundle data = mIntent.getBundleExtra("data");
+            if (data != null) {
+                position = data.getInt("position");
+                mNote = (Note) data.get("Note");
+                mEtTitle.setText(mNote.getNoteTitle());
+                mEditTextUtils.updataContent(mEtModifyContent, mNote.getNoteContent());
+                mSpType.setPrompt(mNote.getNoteType());
+                showAlarmTime(mNote.getAlarmTime(), mNote.isAlarm());
+            }
+
+        }
+
+
     }
 
 
@@ -285,7 +305,6 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                 break;
             case R.id.save:
                 fillNoteData();
-
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -336,7 +355,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TAKE_PICTURE:
                     Uri uri = data.getData();//获取全部图片的uri
@@ -350,9 +369,9 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                         CharSequence drawableStr = mEditTextUtils.with(this)
                                 .to(mEtModifyContent)
                                 .getDrawableStr(picPath);
-                        mEtModifyContent.append("\n\n");
+                        mEtModifyContent.append("\n");
                         mEtModifyContent.append(drawableStr);
-                        mEtModifyContent.append("\n\n");
+                        mEtModifyContent.append("\n");
                     }
 
                     break;
@@ -366,12 +385,16 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
+        ListenerManager.getInstance().unRegisterListener(this);
+        if (mPresenter != null) {
+            mPresenter = null;
+        }
         if (mCustomDialog != null) {
             mCustomDialog.dismiss();
             mCustomDialog = null;
         }
+
+        super.onDestroy();
 
     }
 
@@ -388,27 +411,29 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
 
     @Override
-    public void empty(String s) {
-        Toast.makeText(ModifyDataActivity.this, "" + s, Toast.LENGTH_SHORT).show();
+    public void notifyAllActivity(Object o) {
+
     }
 
     @Override
-    public void successfully() {
-        Toast.makeText(ModifyDataActivity.this, "成功", Toast.LENGTH_SHORT).show();
+    public void successfully(Object o) {
+        if (o instanceof Integer) {
+            ListenerManager.getInstance().sendBroadCast(position);
+        } else if (o instanceof String) {
+            ListenerManager.getInstance().sendBroadCast(o.toString());
+        }
         this.finish();
     }
 
     @Override
     public void failed() {
-        Toast.makeText(ModifyDataActivity.this, "失败", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
-    public void setData(List<Note> notes) {
-        mNote = notes.get(0);
-        mEtTitle.setText(mNote.getNoteTitle());
-        mEditTextUtils.updataContent(mEtModifyContent, mNote.getNoteContent());
-        mSpType.setPrompt(mNote.getNoteType());
-        showAlarmTime(mNote.getAlarmTime(), mNote.isAlarm());
+    public void empty(String s) {
+
     }
+
+
 }

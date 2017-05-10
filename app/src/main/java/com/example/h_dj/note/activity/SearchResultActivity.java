@@ -1,5 +1,6 @@
-package com.example.h_dj.note.ui.activity;
+package com.example.h_dj.note.activity;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,13 +15,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.h_dj.note.App;
 import com.example.h_dj.note.R;
-import com.example.h_dj.note.adapter.SearchAdapter;
-import com.example.h_dj.note.utils.LogUtil;
+import com.example.h_dj.note.adapter.MyMenuAdapter;
+import com.example.h_dj.note.bean.Note;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -30,7 +31,7 @@ import butterknife.OnClick;
  * Created by H_DJ on 2017/5/4.
  */
 
-public class SearchResultActivity<E> extends BaseActivity {
+public class SearchResultActivity<E> extends BaseActivity implements MyMenuAdapter.OnItemClickListener {
 
 
     private static final int START_SEARCH = 1;//开始搜索
@@ -44,20 +45,19 @@ public class SearchResultActivity<E> extends BaseActivity {
     RecyclerView mRecyclerView;
 
 
-    private SearchAdapter mAdapter;
-    private List<String> mStringList;
-    private List<String> mStrings;
+    private MyMenuAdapter mMyMenuAdapter;
+    private List<Note> mNotes;
+    private App mApp;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case START_SEARCH:
-                    mStrings.clear();
+                    mNotes.clear();
                     String filterWord = (String) msg.obj;
-                    mStrings.addAll(filterData(mStringList, filterWord));
-                    LogUtil.e("mStrings.size()" + mStrings.size());
-                    mAdapter.notifyDataSetChanged();
+                    mNotes.addAll(filterData(mApp.getNoteList(), filterWord));
+                    mMyMenuAdapter.notifyDataSetChanged();
                 default:
                     super.handleMessage(msg);
                     break;
@@ -74,20 +74,12 @@ public class SearchResultActivity<E> extends BaseActivity {
     @Override
     public void init() {
         super.init();
+        mApp = (App) this.getApplication();
         setEdit();
         initRecycleView();
-        initData();
+
     }
 
-    /**
-     * 初始化数据
-     */
-    private void initData() {
-        mStringList = new ArrayList<>();
-        for (int i = 1; i < 20; i++) {
-            mStringList.add("测试数据" + i);
-        }
-    }
 
     /**
      * 初始化recyclerView
@@ -97,9 +89,10 @@ public class SearchResultActivity<E> extends BaseActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mStrings = new ArrayList<>();
-        mAdapter = new SearchAdapter(this, R.layout.item_content, mStrings);
-        mRecyclerView.setAdapter(mAdapter);
+        mNotes = new ArrayList<>();
+        mMyMenuAdapter = new MyMenuAdapter(mNotes);
+        mMyMenuAdapter.setOnItemClickListener(this);
+        mRecyclerView.setAdapter(mMyMenuAdapter);
     }
 
     /**
@@ -109,13 +102,13 @@ public class SearchResultActivity<E> extends BaseActivity {
         mEtQueryText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                LogUtil.e(s + ":" + start + ":" + count + ":" + after);
+//                LogUtil.e(s + ":" + start + ":" + count + ":" + after);
 
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                LogUtil.e(s + ":" + start + ":" + count + ":" + before);
+//                LogUtil.e(s + ":" + start + ":" + count + ":" + before);
                 /**
                  * 判断清除按钮是否显示
                  */
@@ -128,7 +121,7 @@ public class SearchResultActivity<E> extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                LogUtil.e(s.toString());
+//                LogUtil.e(s.toString());
                 /**
                  * 发消息更新数据
                  */
@@ -144,7 +137,7 @@ public class SearchResultActivity<E> extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.back:
-              this.finish();
+                this.finish();
                 break;
             case R.id.delete:
                 mEtQueryText.setText("");
@@ -153,28 +146,22 @@ public class SearchResultActivity<E> extends BaseActivity {
     }
 
 
-    /**
-     * 筛选数据
-     *
-     * @param datas
-     * @param filterWord
-     * @return
-     */
-    public List<String> filterData(List<String> datas, String filterWord) {
-
-        List<String> filterList = new ArrayList<>();
-        if (!TextUtils.isEmpty(filterWord)) {
-            ListIterator<String> iterator = datas.listIterator();
-            while (iterator.hasNext()) {
-                String next = iterator.next();
-                if (next.contains(filterWord)) {
-                    filterList.add(next);
-                    LogUtil.e("filterList.size()" + filterList.size());
-                }
-            }
-        }
-
-        return filterList;
+    @Override
+    public void OnClick(View view, int position) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("Note", mNotes.get(position));
+        bundle.putInt("position", position);
+        goTo(ModifyDataActivity.class, bundle);
     }
 
+    @Override
+    public void OnLongClick(View view, int position) {
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        hiddenSoftwareInput(mEtQueryText);
+    }
 }

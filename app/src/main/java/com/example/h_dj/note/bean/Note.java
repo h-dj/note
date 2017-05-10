@@ -1,10 +1,12 @@
 package com.example.h_dj.note.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by H_DJ on 2017/5/6.
  */
 
-public class Note {
+public class Note implements Serializable{
 
     private String noteId;//便签id
     private String noteTitle;//便签标题
@@ -14,6 +16,15 @@ public class Note {
     private boolean isAlarm;//是否设置提醒
     private boolean isMark;//是否添加类星号 可以为空
     private String noteContent;//内容
+    private int isDel;
+
+    public int getIsDel() {
+        return isDel;
+    }
+
+    public void setIsDel(int isDel) {
+        this.isDel = isDel;
+    }
 
     public boolean isAlarm() {
         return isAlarm;

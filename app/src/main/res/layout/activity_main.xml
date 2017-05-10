@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:openDrawer="start"
-    tools:context="com.example.h_dj.note.ui.activity.MainActivity">
+    tools:context="com.example.h_dj.note.activity.MainActivity">
 
     <include
         layout="@layout/app_bar"

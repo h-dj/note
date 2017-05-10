@@ -1,15 +1,16 @@
 package com.example.h_dj.note.presenter.Impl;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
 import com.example.h_dj.note.bean.Note;
-import com.example.h_dj.note.presenter.AllNotePresenter;
+import com.example.h_dj.note.presenter.MainPresenter;
 import com.example.h_dj.note.utils.LogUtil;
 import com.example.h_dj.note.utils.NotesUtils;
-import com.example.h_dj.note.view.AllNoteFragmentView;
+import com.example.h_dj.note.Listener.MainView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,12 @@ import java.util.List;
  * Created by H_DJ on 2017/5/7.
  */
 
-public class AllNotePresenterImpl implements AllNotePresenter {
+public class MainPresenterImpl implements MainPresenter {
 
     private Context mContext;
-    private AllNoteFragmentView mView;
+    private MainView mView;
 
-    public AllNotePresenterImpl(Context context, AllNoteFragmentView view) {
+    public MainPresenterImpl(Context context, MainView view) {
         mContext = context;
         mView = view;
     }
@@ -39,20 +40,23 @@ public class AllNotePresenterImpl implements AllNotePresenter {
         } else {
             mView.failed();
         }
-
+        query.close();
     }
 
     @Override
-    public void del(String noteId) {
+    public void del(int position, String noteId) {
         ContentResolver resolver = mContext.getContentResolver();
         Uri uri = Uri.parse(NotesUtils.Note.NOTE_CONTENT_URL.toString() + "/" + noteId);
-        int delete = resolver.delete(uri, "noteId = ?", new String[]{noteId});
+        ContentValues values = new ContentValues();
+        values.put("isDel", 1);
+        int delete = resolver.update(uri, values, "noteId = ?", new String[]{noteId});
+        LogUtil.e(delete + ":" + noteId);
         if (delete > 0) {
-            mView.delSuccess();
+            mView.delSuccess(position);
         } else {
-            LogUtil.e(delete + ":" + noteId);
             mView.failed();
         }
+
     }
 
 
@@ -74,6 +78,7 @@ public class AllNotePresenterImpl implements AllNotePresenter {
             note.setAlarm(String.valueOf(query.getString(query.getColumnIndex("isAlarm")) + "").equals("1"));
             note.setMark(String.valueOf(query.getString(query.getColumnIndex("isMark")) + "").equals("1"));
             note.setNoteContent(query.getString(query.getColumnIndex("noteContent")));
+            note.setIsDel(query.getInt(query.getColumnIndex("isDel")));
             notes.add(note);
         }
         return notes;
