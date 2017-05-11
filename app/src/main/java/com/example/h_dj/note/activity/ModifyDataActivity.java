@@ -192,7 +192,7 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
         String videoUri = getIntent().getStringExtra(MediaRecorderActivity.VIDEO_URI);
         if (!TextUtils.isEmpty(videoUri)) {
             LogUtil.e("视频地址" + videoUri);
-            mEtModifyContent.setHtml((mEtModifyContent.getHtml() == null ? "&nbsp;" : mEtModifyContent.getHtml()) + "<br/><video src='" + videoUri + "' width='200' controls>不支持视频</video>&nbsp;");
+            mEtModifyContent.setHtml((mEtModifyContent.getHtml() == null ? "&nbsp;" : mEtModifyContent.getHtml()) + "<video src='" + videoUri + "' width='" + (int) (mScreenWidth * 0.3f) + "' height='" + (int) (mScreenHeight * 0.2f) + "' align='center' controls>不支持视频</video>&nbsp;<br/>");
         }
 
         super.onResume();
@@ -539,7 +539,8 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
 //                Toast.makeText(ModifyDataActivity.this, "提醒", Toast.LENGTH_SHORT).show();
                 break;
             case android.R.id.home:
-                this.finish();
+                mApp.finishAll();
+
                 break;
             case R.id.save:
                 fillNoteData();
