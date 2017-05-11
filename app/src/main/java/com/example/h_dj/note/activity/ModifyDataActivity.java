@@ -2,6 +2,7 @@ package com.example.h_dj.note.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,7 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ScrollView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,7 +28,6 @@ import com.example.h_dj.note.bean.Note;
 import com.example.h_dj.note.presenter.Impl.ModifyPresenterImpl;
 import com.example.h_dj.note.presenter.ModifyPresenter;
 import com.example.h_dj.note.utils.DateUtils;
-import com.example.h_dj.note.utils.EditTextUtils;
 import com.example.h_dj.note.utils.LogUtil;
 import com.example.h_dj.note.widgets.CustomDialog;
 import com.example.h_dj.note.widgets.PickerFragment;
@@ -37,36 +38,85 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import jp.wasabeef.richeditor.RichEditor;
 
 /**
  * Created by H_DJ on 2017/5/5.
  */
 
-public class ModifyDataActivity extends BaseActivity implements View.OnFocusChangeListener, IListener, ModifyView {
+public class ModifyDataActivity extends BaseActivity implements IListener, ModifyView {
+
+
+    private static final int TAKE_PICTURE = 1; //选择图片的requestCode
     @BindView(R.id.main_toolbar)
     Toolbar mMainToolbar;
-    @BindView(R.id.et_modify_content)
-    EditText mEtModifyContent;
-    @BindView(R.id.tv_video)
-    TextView mTvVideo;
-    @BindView(R.id.tv_photo)
-    TextView mTvPhoto;
-    @BindView(R.id.tv_voice)
-    TextView mTvVoice;
-    @BindView(R.id.tv_doodle)
-    TextView mTvDoodle;
     @BindView(R.id.et_title)
     EditText mEtTitle;
+    @BindView(R.id.sp_type)
+    Spinner mSpType;
     @BindView(R.id.tv_modify_time)
     TextView mTvModifyTime;
     @BindView(R.id.tv_alarmClock_time)
     TextView mTvAlarmClockTime;
-    @BindView(R.id.sp_type)
-    Spinner mSpType;
-    @BindView(R.id.sll)
-    ScrollView mSll;
+    @BindView(R.id.ll_info)
+    LinearLayout mLlInfo;
+    @BindView(R.id.et_modify_content)
+    RichEditor mEtModifyContent;
 
-    private static final int TAKE_PICTURE = 1; //选择图片的requestCode
+    @BindView(R.id.action_undo)
+    ImageButton mActionUndo;
+    @BindView(R.id.action_redo)
+    ImageButton mActionRedo;
+    @BindView(R.id.action_bold)
+    ImageButton mActionBold;
+    @BindView(R.id.action_italic)
+    ImageButton mActionItalic;
+    @BindView(R.id.action_subscript)
+    ImageButton mActionSubscript;
+    @BindView(R.id.action_superscript)
+    ImageButton mActionSuperscript;
+    @BindView(R.id.action_strikethrough)
+    ImageButton mActionStrikethrough;
+    @BindView(R.id.action_underline)
+    ImageButton mActionUnderline;
+    @BindView(R.id.action_heading1)
+    ImageButton mActionHeading1;
+    @BindView(R.id.action_heading2)
+    ImageButton mActionHeading2;
+    @BindView(R.id.action_heading3)
+    ImageButton mActionHeading3;
+    @BindView(R.id.action_heading4)
+    ImageButton mActionHeading4;
+    @BindView(R.id.action_heading5)
+    ImageButton mActionHeading5;
+    @BindView(R.id.action_heading6)
+    ImageButton mActionHeading6;
+    @BindView(R.id.action_txt_color)
+    ImageButton mActionTxtColor;
+    @BindView(R.id.action_bg_color)
+    ImageButton mActionBgColor;
+    @BindView(R.id.action_indent)
+    ImageButton mActionIndent;
+    @BindView(R.id.action_outdent)
+    ImageButton mActionOutdent;
+    @BindView(R.id.action_align_left)
+    ImageButton mActionAlignLeft;
+    @BindView(R.id.action_align_center)
+    ImageButton mActionAlignCenter;
+    @BindView(R.id.action_align_right)
+    ImageButton mActionAlignRight;
+
+    @BindView(R.id.action_insert_image)
+    ImageButton mActionInsertImage;
+    @BindView(R.id.action_insert_link)
+    ImageButton mActionInsertLink;
+
+    @BindView(R.id.action_insert_video)
+    ImageButton mActionInsertVideo;
+    @BindView(R.id.action_insert_voice)
+    ImageButton mActionInsertVoice;
+    @BindView(R.id.action_insert_doodle)
+    ImageButton mActionInsertDoodle;
     /**
      * Note类型
      */
@@ -75,7 +125,6 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
     private CustomDialog mCustomDialog;//自定义对话框
     private PickerFragment mPickerFragment;//日期时间选择器
-    private EditTextUtils mEditTextUtils;//使EditText显示图片的utils
 
     //P层引用
     private ModifyPresenter mPresenter;
@@ -93,10 +142,6 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         ListenerManager.getInstance().registerListtener(this);
         mIntent = getIntent();
         mNote = new Note();
-        //设置EditText获取焦点；软键盘显示或隐藏问题
-        mEtModifyContent.setOnFocusChangeListener(this);
-        mEtTitle.setOnFocusChangeListener(this);
-        mEditTextUtils = EditTextUtils.getInstance();
         mPresenter = new ModifyPresenterImpl(getApplicationContext(), this);
         setData();
         initToolbar();
@@ -105,6 +150,16 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         initModifyTime();
         initPickerFragment();
         initDialog();
+        initRichEdit();
+    }
+
+    /**
+     * 初始化富文本
+     */
+    private void initRichEdit() {
+        mEtModifyContent.setEditorFontSize(22);
+        mEtModifyContent.setAlignLeft();
+        mEtModifyContent.setPadding(10, 10, 10, 10);
     }
 
     /**
@@ -118,7 +173,7 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                 position = data.getInt("position");
                 mNote = (Note) data.get("Note");
                 mEtTitle.setText(mNote.getNoteTitle());
-                mEditTextUtils.updataContent(mEtModifyContent, mNote.getNoteContent());
+                mEtModifyContent.setHtml(mNote.getNoteContent());
                 mSpType.setPrompt(mNote.getNoteType());
                 showAlarmTime(mNote.getAlarmTime(), mNote.isAlarm());
             }
@@ -326,31 +381,11 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
         } else {
             mNote.setAlarmTime(null);
         }
-        String noteNontent = mEtModifyContent.getText().toString();
+        String noteNontent = mEtModifyContent.getHtml().toString();
         mNote.setNoteContent(noteNontent);
 
         mPresenter.AddData(mNote);
         LogUtil.e(mNote.toString());
-    }
-
-    @OnClick({R.id.tv_video, R.id.tv_photo, R.id.tv_voice, R.id.tv_doodle})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_video:
-                break;
-            case R.id.tv_photo:
-                //选择图片
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent, TAKE_PICTURE);
-                break;
-            case R.id.tv_voice:
-                break;
-            case R.id.tv_doodle:
-                break;
-
-        }
     }
 
     @Override
@@ -366,14 +401,8 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
                     String picPath = query.getString(columnIndex);
                     LogUtil.e(picPath);
                     if (!TextUtils.isEmpty(picPath)) {
-                        CharSequence drawableStr = mEditTextUtils.with(this)
-                                .to(mEtModifyContent)
-                                .getDrawableStr(picPath);
-                        mEtModifyContent.append("\n");
-                        mEtModifyContent.append(drawableStr);
-                        mEtModifyContent.append("\n");
+                        mEtModifyContent.insertImage(picPath, "images");
                     }
-
                     break;
                 default:
                     super.onActivityResult(requestCode, resultCode, data);
@@ -396,17 +425,6 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
 
         super.onDestroy();
 
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) {
-            //显示软键盘
-            showSoftwareInput(v);
-        } else {
-            //隐藏软键盘
-            hiddenSoftwareInput(v);
-        }
     }
 
 
@@ -436,4 +454,133 @@ public class ModifyDataActivity extends BaseActivity implements View.OnFocusChan
     }
 
 
+    @OnClick(R.id.action_undo)
+    public void onMActionUndoClicked() {
+        mEtModifyContent.undo();
+    }
+
+    @OnClick(R.id.action_redo)
+    public void onMActionRedoClicked() {
+        mEtModifyContent.redo();//恢复
+    }
+
+    @OnClick(R.id.action_bold)
+    public void onMActionBoldClicked() {
+        mEtModifyContent.setBold();//加粗
+    }
+
+    @OnClick(R.id.action_italic)
+    public void onMActionItalicClicked() {
+        mEtModifyContent.setItalic();
+    }
+
+    @OnClick(R.id.action_subscript)
+    public void onMActionSubscriptClicked() {
+        mEtModifyContent.setSubscript();
+
+    }
+
+    @OnClick(R.id.action_superscript)
+    public void onMActionSuperscriptClicked() {
+        mEtModifyContent.setSuperscript();
+    }
+
+    @OnClick(R.id.action_strikethrough)
+    public void onMActionStrikethroughClicked() {
+        mEtModifyContent.setStrikeThrough();
+    }
+
+    @OnClick(R.id.action_underline)
+    public void onMActionUnderlineClicked() {
+        mEtModifyContent.setUnderline();
+    }
+
+    @OnClick(R.id.action_heading1)
+    public void onMActionHeading1Clicked() {
+        mEtModifyContent.setHeading(1);
+    }
+
+    @OnClick(R.id.action_heading2)
+    public void onMActionHeading2Clicked() {
+        mEtModifyContent.setHeading(2);
+
+    }
+
+    @OnClick(R.id.action_heading3)
+    public void onMActionHeading3Clicked() {
+        mEtModifyContent.setHeading(3);
+
+    }
+
+    @OnClick(R.id.action_heading4)
+    public void onMActionHeading4Clicked() {
+        mEtModifyContent.setHeading(4);
+
+    }
+
+    @OnClick(R.id.action_heading5)
+    public void onMActionHeading5Clicked() {
+        mEtModifyContent.setHeading(5);
+
+    }
+
+    @OnClick(R.id.action_heading6)
+    public void onMActionHeading6Clicked() {
+        mEtModifyContent.setHeading(6);
+
+    }
+
+    @OnClick(R.id.action_txt_color)
+    public void onMActionTxtColorClicked() {
+        mEtModifyContent.setTextColor(Color.RED);
+    }
+
+    @OnClick(R.id.action_bg_color)
+    public void onMActionBgColorClicked() {
+
+    }
+
+    @OnClick(R.id.action_indent)
+    public void onMActionIndentClicked() {
+        mEtModifyContent.setIndent();
+    }
+
+    @OnClick(R.id.action_outdent)
+    public void onMActionOutdentClicked() {
+        mEtModifyContent.setOutdent();
+    }
+
+    @OnClick(R.id.action_align_left)
+    public void onMActionAlignLeftClicked() {
+        mEtModifyContent.setAlignLeft();
+    }
+
+    @OnClick(R.id.action_align_center)
+    public void onMActionAlignCenterClicked() {
+        mEtModifyContent.setAlignCenter();
+
+    }
+
+    @OnClick(R.id.action_align_right)
+    public void onMActionAlignRightClicked() {
+        mEtModifyContent.setAlignRight();
+
+    }
+
+
+    @OnClick(R.id.action_insert_image)
+    public void onMActionInsertImageClicked() {
+        //插入图片
+        //选择图片
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, TAKE_PICTURE);
+    }
+
+    @OnClick(R.id.action_insert_link)
+    public void onMActionInsertLinkClicked() {
+        //插入链接
+//        mEtModifyContent.insertLink();
+    }
 }

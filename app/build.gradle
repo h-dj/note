@@ -35,4 +35,6 @@ dependencies {
 
     compile 'com.yanzhenjie:recyclerview-swipe:1.0.0'
 
+    compile 'jp.wasabeef:richeditor-android:0.0.2@aar'
+
 }

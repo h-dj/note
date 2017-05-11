@@ -13,7 +13,6 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"></style>
 
 
-
     <!--自定义dialog背景全透明无边框theme -->
     <style name="MyDialog" parent="android:style/Theme.Dialog">
         <!--背景颜色及和透明程度-->
@@ -26,5 +25,12 @@
         <item name="android:windowIsFloating">true</item>
         <!--是否模糊-->
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="richEditTextTools">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:background">@null</item>
+        <item name="android:contentDescription">@null</item>
     </style>
 </resources>

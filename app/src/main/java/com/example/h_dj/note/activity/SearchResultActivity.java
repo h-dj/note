@@ -159,9 +159,5 @@ public class SearchResultActivity<E> extends BaseActivity implements MyMenuAdapt
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        hiddenSoftwareInput(mEtQueryText);
-    }
+
 }

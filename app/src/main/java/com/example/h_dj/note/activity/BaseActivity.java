@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import com.example.h_dj.note.bean.Note;
 import com.example.h_dj.note.utils.LogUtil;
@@ -25,8 +23,6 @@ import butterknife.Unbinder;
 public abstract class BaseActivity extends AppCompatActivity {
 
     private Unbinder unbinder;
-    public InputMethodManager manager; //软键盘服务
-    public static List<Note> mSharaData;
     protected static final int RECYCLE = 1; //垃圾箱
     protected static final int DAILY = 2; //日常便签
     protected static final int STUDY = 3;
@@ -38,20 +34,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
         unbinder = ButterKnife.bind(this);
-        mSharaData = new ArrayList<>();
         init();
     }
 
-    /**
-     * 初始化方法
-     */
     public void init() {
-        //获取软键盘服务
-        if (manager == null) {
-            manager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        }
-
     }
+
 
     /**
      * 获取布局id
@@ -73,25 +61,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-
-    /**
-     * 隐藏软键盘
-     *
-     * @param v
-     */
-    public void hiddenSoftwareInput(View v) {
-        //默认关闭软件盘
-        manager.hideSoftInputFromWindow(v.getWindowToken(), 0);
-    }
-
-    /**
-     * 显示软键盘
-     *
-     * @param v
-     */
-    public void showSoftwareInput(View v) {
-        manager.showSoftInput(v, 0);
-    }
 
     /**
      * activity之间的跳转
