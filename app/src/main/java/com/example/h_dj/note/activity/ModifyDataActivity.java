@@ -624,6 +624,7 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
             ListenerManager.getInstance().sendBroadCast(o.toString());
         }
         mApp.finishAll();
+
         this.finish();
     }
 
