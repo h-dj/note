@@ -2,7 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.h_dj.note">
 
+
+    <!-- 录音 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--播音-->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -28,6 +35,8 @@
             android:name=".activity.ModifyDataActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 
+        <!--视频录制-->
+        <activity android:name="mabeijianxi.camera.MediaRecorderActivity"/>
         <!--内容提供这-->
         <provider
             android:name=".provider.MyContentProvider"

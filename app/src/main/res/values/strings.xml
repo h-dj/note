@@ -7,4 +7,9 @@
     <string name="title">标题</string>
     <string name="alarmClock">05/04 10：20</string>
     <string name="tip">类型</string>
+
+    <string name="voice_rec">手指上滑，取消发送</string>
+    <string name="voice_cancel">松开手指，取消发送</string>
+    <string name="voice_short">录音时间太短</string>
+    <string name="voice_failure">录音失败！</string>
 </resources>

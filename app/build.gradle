@@ -35,6 +35,13 @@ dependencies {
 
     compile 'com.yanzhenjie:recyclerview-swipe:1.0.0'
 
-    compile 'jp.wasabeef:richeditor-android:0.0.2@aar'
+    //富文本
+    compile 'jp.wasabeef:richeditor-android:1.2.2'
+
+    //音频
+    compile 'com.lqr.audio:library:1.0.0'
+
+    //视频
+    compile 'com.mabeijianxi:small-video-record:1.2.0'
 
 }

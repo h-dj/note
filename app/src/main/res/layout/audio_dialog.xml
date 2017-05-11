@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/audio_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="标题"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/audio_title"/>
+
+    <Button
+        android:id="@+id/audio_record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/audio_title"
+        android:layout_alignParentBottom="true"
+        android:text="录音"/>
+
+</RelativeLayout>

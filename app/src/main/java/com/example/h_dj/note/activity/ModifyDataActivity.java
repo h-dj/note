@@ -5,21 +5,31 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.h_dj.note.App;
 import com.example.h_dj.note.Listener.IListener;
 import com.example.h_dj.note.Listener.ListenerManager;
 import com.example.h_dj.note.Listener.ModifyView;
@@ -31,7 +41,10 @@ import com.example.h_dj.note.utils.DateUtils;
 import com.example.h_dj.note.utils.LogUtil;
 import com.example.h_dj.note.widgets.CustomDialog;
 import com.example.h_dj.note.widgets.PickerFragment;
+import com.lqr.audio.AudioRecordManager;
+import com.lqr.audio.IAudioRecordListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +52,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import jp.wasabeef.richeditor.RichEditor;
+import mabeijianxi.camera.MediaRecorderActivity;
+import mabeijianxi.camera.model.AutoVBRMode;
+import mabeijianxi.camera.model.MediaRecorderConfig;
 
 /**
  * Created by H_DJ on 2017/5/5.
@@ -130,6 +146,14 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
     private ModifyPresenter mPresenter;
     private Intent mIntent;
     private int position;
+    private File mAudioDir;//音频路径
+    private double mScreenWidth;
+    private double mScreenHeight;
+    private DisplayMetrics displayMetrics;
+    private View AudioView;
+    private AlertDialog alertDialog;
+
+    private App mApp;
 
     @Override
     protected int getLayoutId() {
@@ -139,6 +163,15 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
     @Override
     public void init() {
         super.init();
+
+        mApp = (App) getApplication();
+        initAudioRecordManager();
+        //获取屏幕宽高
+        displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        mScreenWidth = displayMetrics.widthPixels;
+        mScreenHeight = displayMetrics.heightPixels;
+
         ListenerManager.getInstance().registerListtener(this);
         mIntent = getIntent();
         mNote = new Note();
@@ -151,6 +184,157 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
         initPickerFragment();
         initDialog();
         initRichEdit();
+    }
+
+    @Override
+    protected void onResume() {
+        mApp.addActivity(this);
+        String videoUri = getIntent().getStringExtra(MediaRecorderActivity.VIDEO_URI);
+        if (!TextUtils.isEmpty(videoUri)) {
+            LogUtil.e("视频地址" + videoUri);
+            mEtModifyContent.setHtml((mEtModifyContent.getHtml() == null ? "&nbsp;" : mEtModifyContent.getHtml()) + "<br/><video src='" + videoUri + "' width='200' controls>不支持视频</video>&nbsp;");
+        }
+
+        super.onResume();
+    }
+
+    /**
+     * 初始化录音
+     */
+    private void initAudioRecordManager() {
+        //设置录音最大时长
+        //默认时长60秒
+        AudioRecordManager.getInstance(this).setMaxVoiceDuration(120);
+        //设置录音存放路径
+        mAudioDir = new File(Environment.getExternalStorageDirectory(), "LQR_AUDIO");
+        if (!mAudioDir.exists()) {
+            mAudioDir.mkdirs();
+        }
+        AudioRecordManager.getInstance(this).setAudioSavePath(mAudioDir.getAbsolutePath());
+        //初始化监听事件
+        AudioRecordManager.getInstance(this).setAudioRecordListener(new IAudioRecordListener() {
+
+            private TextView mTimerTV;
+            private TextView mStateTV;
+            private ImageView mStateIV;
+            private PopupWindow mRecordWindow;
+
+
+            @Override
+            public void initTipView() {
+                View view = View.inflate(ModifyDataActivity.this, R.layout.popup_audio_wi_vo, null);
+                mStateIV = (ImageView) view.findViewById(R.id.rc_audio_state_image);
+                mStateTV = (TextView) view.findViewById(R.id.rc_audio_state_text);
+                mTimerTV = (TextView) view.findViewById(R.id.rc_audio_timer);
+                mRecordWindow = new PopupWindow(view, -1, -1);
+                mRecordWindow.showAtLocation(AudioView, 17, 0, 0);
+                mRecordWindow.setFocusable(true);
+                mRecordWindow.setOutsideTouchable(false);
+                mRecordWindow.setTouchable(false);
+            }
+
+            @Override
+            public void setTimeoutTipView(int counter) {
+                if (this.mRecordWindow != null) {
+                    this.mStateIV.setVisibility(View.GONE);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_rec);
+                    this.mStateTV.setBackgroundResource(R.drawable.bg_voice_popup);
+                    this.mTimerTV.setText(String.format("%s", new Object[]{Integer.valueOf(counter)}));
+                    this.mTimerTV.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void setRecordingTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mStateIV.setVisibility(View.VISIBLE);
+                    this.mStateIV.setImageResource(R.mipmap.ic_volume_1);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_rec);
+                    this.mStateTV.setBackgroundResource(R.drawable.bg_voice_popup);
+                    this.mTimerTV.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void setAudioShortTipView() {
+                if (this.mRecordWindow != null) {
+                    mStateIV.setImageResource(R.mipmap.ic_volume_wraning);
+                    mStateTV.setText(R.string.voice_short);
+                }
+            }
+
+            @Override
+            public void setCancelTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mTimerTV.setVisibility(View.GONE);
+                    this.mStateIV.setVisibility(View.VISIBLE);
+                    this.mStateIV.setImageResource(R.mipmap.ic_volume_cancel);
+                    this.mStateTV.setVisibility(View.VISIBLE);
+                    this.mStateTV.setText(R.string.voice_cancel);
+                    this.mStateTV.setBackgroundResource(R.drawable.corner_voice_style);
+                }
+            }
+
+            @Override
+            public void destroyTipView() {
+                if (this.mRecordWindow != null) {
+                    this.mRecordWindow.dismiss();
+                    this.mRecordWindow = null;
+                    this.mStateIV = null;
+                    this.mStateTV = null;
+                    this.mTimerTV = null;
+                }
+            }
+
+            @Override
+            public void onStartRecord() {
+                //开始录制
+            }
+
+            @Override
+            public void onFinish(Uri audioPath, int duration) {
+                File file = new File(audioPath.getPath());
+                if (!file.exists()) {
+                    Toast.makeText(ModifyDataActivity.this, "录制失败", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                //发送文件
+                mEtModifyContent.setHtml((mEtModifyContent.getHtml() == null ? "&nbsp;" : mEtModifyContent.getHtml()) + "<br/><audio controls='controls' height='100' width='100'>" +
+                        "  <source src='" + audioPath + "' /></audio>&nbsp;");
+                alertDialog.dismiss();
+            }
+
+            @Override
+            public void onAudioDBChanged(int db) {
+                switch (db / 5) {
+                    case 0:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_1);
+                        break;
+                    case 1:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_2);
+                        break;
+                    case 2:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_3);
+                        break;
+                    case 3:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_4);
+                        break;
+                    case 4:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_5);
+                        break;
+                    case 5:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_6);
+                        break;
+                    case 6:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_7);
+                        break;
+                    default:
+                        this.mStateIV.setImageResource(R.mipmap.ic_volume_8);
+                }
+            }
+        });
     }
 
     /**
@@ -174,7 +358,6 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
                 mNote = (Note) data.get("Note");
                 mEtTitle.setText(mNote.getNoteTitle());
                 mEtModifyContent.setHtml(mNote.getNoteContent());
-                mSpType.setPrompt(mNote.getNoteType());
                 showAlarmTime(mNote.getAlarmTime(), mNote.isAlarm());
             }
 
@@ -440,6 +623,7 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
         } else if (o instanceof String) {
             ListenerManager.getInstance().sendBroadCast(o.toString());
         }
+        mApp.finishAll();
         this.finish();
     }
 
@@ -582,5 +766,76 @@ public class ModifyDataActivity extends BaseActivity implements IListener, Modif
     public void onMActionInsertLinkClicked() {
         //插入链接
 //        mEtModifyContent.insertLink();
+    }
+
+    @OnClick(R.id.action_insert_video)
+    public void onMActionInsertVideoClicked() {
+        // 录制
+        MediaRecorderConfig config = new MediaRecorderConfig.Buidler()
+                .doH264Compress(new AutoVBRMode()
+                )
+                .setMediaBitrateConfig(new AutoVBRMode())
+                .smallVideoWidth(480)
+                .smallVideoHeight(360)
+                .recordTimeMax(6 * 1000)
+                .maxFrameRate(20)
+                .captureThumbnailsTime(1)
+                .recordTimeMin((int) (1.5 * 1000))
+                .build();
+        MediaRecorderActivity.goSmallVideoRecorder(this, ModifyDataActivity.class.getName(), config);
+
+
+    }
+
+    @OnClick(R.id.action_insert_voice)
+    public void onMActionInsertVoiceClicked() {
+        AudioView = LayoutInflater.from(this).inflate(R.layout.audio_dialog, null);
+        TextView tv_title = (TextView) AudioView.findViewById(R.id.audio_title);
+        tv_title.setText("添加录音便签");
+        Button record = (Button) AudioView.findViewById(R.id.audio_record);
+        //插入音频
+
+        alertDialog = new AlertDialog.Builder(this)
+                .setView(AudioView)
+                .setCancelable(false)
+                .create();
+        alertDialog.show();
+        alertDialog.getWindow().setLayout((int) (mScreenWidth * 0.75), (int) (mScreenHeight * 0.5));
+        record.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        AudioRecordManager.getInstance(ModifyDataActivity.this).startRecord();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (isCancelled(v, event)) {
+                            AudioRecordManager.getInstance(ModifyDataActivity.this).willCancelRecord();
+                        } else {
+                            AudioRecordManager.getInstance(ModifyDataActivity.this).continueRecord();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        AudioRecordManager.getInstance(ModifyDataActivity.this).stopRecord();
+                        AudioRecordManager.getInstance(ModifyDataActivity.this).destroyRecord();
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
+
+    private boolean isCancelled(View view, MotionEvent event) {
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        if (event.getRawX() < location[0] || event.getRawX() > location[0] + view.getWidth() || event.getRawY() < location[1] - 40) {
+            return true;
+        }
+        return false;
+    }
+
+    @OnClick(R.id.action_insert_doodle)
+    public void onMActionInsertDoodleClicked() {
     }
 }
