@@ -29,6 +29,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static final int ENTERTAINMENT = 4;
 
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
